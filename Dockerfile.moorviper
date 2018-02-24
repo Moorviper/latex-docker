@@ -1,0 +1,37 @@
+FROM ubuntu:xenial
+MAINTAINER Benedikt Lang <mail@blang.io>
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update -q \
+    && apt-get install -qy build-essential wget libfontconfig1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install TexLive with scheme-basic
+RUN wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz; \
+	mkdir /install-tl-unx; \
+	tar -xvf install-tl-unx.tar.gz -C /install-tl-unx --strip-components=1; \
+    echo "selected_scheme scheme-basic" >> /install-tl-unx/texlive.profile; \
+	/install-tl-unx/install-tl -profile /install-tl-unx/texlive.profile; \
+    rm -r /install-tl-unx; \
+	rm install-tl-unx.tar.gz
+
+ENV PATH="/usr/local/texlive/2017/bin/x86_64-linux:${PATH}"
+
+ENV HOME /data
+WORKDIR /data
+
+# Install latex packages
+RUN tlmgr install collection-basic
+RUN tlmgr install collection-bibtexextra
+RUN tlmgr install collection-binextra
+RUN tlmgr install collection-langenglish
+RUN tlmgr install collection-langgerman
+RUN tlmgr install collection-latex
+RUN tlmgr install collection-latexextra
+RUN tlmgr install collection-latexrecommended
+RUN tlmgr install collection-luatex
+RUN tlmgr install collection-mathscience
+RUN tlmgr install collection-pictures
+RUN tlmgr install collection-plaingeneric
+RUN tlmgr install collection-pstricks
+VOLUME ["/data"]
